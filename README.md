@@ -118,4 +118,3 @@ if bacon_points >= cutoff or is_suspicious(new_score):
 
 ## 调参与验证建议
 - 在接近胜利（score + potential_gain >= GOAL）时，优先选择能立即获胜或避免被对手利用的保守策略。
-```
