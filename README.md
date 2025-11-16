@@ -63,3 +63,59 @@ Hog 是一个双人回合制掷骰子游戏。两名玩家轮流进行回合，�
 - 悲伤之种 / Pig Out：掷出任一骰子为 1，则该回合得分为 1。
 - 野猪乱斗：掷 0 个骰子时按规则计算得分（见上文）。
 - 可疑数：恰好有 3 或 4 个因数的数；触发后将分数提升到下一个质数。
+
+## 策略（Strategies）——网页中常见的三类策略说明
+下面介绍网页（如 CS61A Hog 项目）中常见且与本仓库三条规则对应的三类简单策略，并给出实现形式与示例代码骨架。策略都应仅基于当前分数与对手分数做决策。
+
+策略统一约束（函数签名）
+- 最终提交/比赛策略签名通常是：
+```python
+def strategy(score, opponent_score):
+    """返回要掷的骰子数量（整数，范围通常是 0 到 10）。"""
+    return num_rolls
+```
+- 所有策略应为纯函数（无副作用），相同输入返回相同输出，返回值为合法的骰子数量（0 表示使用“掷 0”规则）。
+
+1) 永远只投同样数量（always-roll / always_roll_n）
+- 思路：始终掷固定数量的骰子，不使用掷 0 的规则，也不专门去追求可疑数。
+- 用途：基线策略，便于比较和统计。
+- 实现形式（通常为高阶函数，方便生成不同 n 的策略）：
+```python
+def always_roll(n):
+    def strategy(score, opponent_score):
+        return n  # 始终掷 n 个骰子
+    return strategy
+```
+
+2) 怀疑数策略（怀疑数即使用掷 0 策略的变体）
+- 说明（按照你的要求）：怀疑数策略以掷 0（野猪乱斗）的规则为核心，但其决策依据是“掷 0 后增加的点数是否达到阈值”。具体行为：
+  - 增加一个阈值参数 cutoff 和默认投点数 default_rolls；
+  - 计算如果选择掷 0（即使用野猪乱斗规则）本回合将增加的点数（可通过仓库中的 free_bacon 或相应实现计算）；
+  - 若该增加的点数 >= cutoff，则选择掷 0；否则掷 default_rolls 个骰子。
+- 该策略等价于“在预期固定收益足够大时选择掷 0，否则回退到默认掷法”。
+- 示范骨架（假定仓库实现了 free_bacon(opponent_score) 来计算掷 0 获得的点数）：
+```python
+def suspect_strategy(score, opponent_score, cutoff=8, default_rolls=4):
+    """
+    怀疑数策略（本策略以掷 0 为手段）：
+    - cutoff: 当掷 0 可得到的点数 >= cutoff 时选择掷 0
+    - default_rolls: 否则掷的默认骰子数
+    """
+    bacon_points = free_bacon(opponent_score)  # 仓库中已有实现（根据野猪乱斗规则）
+    if bacon_points >= cutoff:
+        return 0
+    return default_rolls
+```
+- 说明：如果你还希望策略在掷 0 后的新分数为可疑数时也优先选择掷 0（以便触发质数提升），可以把判断扩展为：
+```python
+new_score = score + bacon_points
+if bacon_points >= cutoff or is_suspicious(new_score):
+    return 0
+```
+3) 投固定策略的比较与组合
+- 可把 suspect_strategy 与 always_roll 组合成更复杂的 final_strategy：先用 suspect_strategy 判断是否掷 0，否则回退到 always_roll 的默认值或针对当前局面的自适应掷数。
+- 推荐在组合时保持函数简洁、可测、并重用仓库中已有的辅助函数（如is_suspicious、next_prime 等）。
+
+## 调参与验证建议
+- 在接近胜利（score + potential_gain >= GOAL）时，优先选择能立即获胜或避免被对手利用的保守策略。
+```
