@@ -111,6 +111,31 @@ new_score = score + bacon_points
 if bacon_points >= cutoff or is_suspicious(new_score):
     return 0
 ```
+3) catch_up策略
+- catch_up 策略的规则很简单：如果当前玩家的分数小于对手的分数（处于落后状态），则投 6 个骰子；否则投 5 个骰子。该策略用于在落后时提高得分机会，在领先时保持较低的风险。
+
+示例：
+
+```python
+def catch_up_strategy(score, opponent_score):
+    """If behind, roll 6 dice; otherwise roll 5 dice.
+
+    score: current player's score (int)
+    opponent_score: opponent's score (int)
+    returns: number of dice to roll (int)
+    """
+    return 6 if score < opponent_score else 5
+```
+
+将此函数放入 hog.py 的策略集合中（或直接在需要的位置调用）即可在比赛中使用。一个简单的使用示例（pseudo-usage）：
+
+```python
+from hog import play, catch_up_strategy
+
+# 在 play 函数中将当前玩家的策略设为 catch_up_strategy 即可
+# 例如：play(catch_up_strategy, another_strategy)
+```
+
 3) 投固定策略的比较与组合
 - 可把 suspect_strategy 与 always_roll 组合成更复杂的 final_strategy：先用 suspect_strategy 判断是否掷 0，否则回退到 always_roll 的默认值或针对当前局面的自适应掷数。
 - 推荐在组合时保持函数简洁、可测、并重用仓库中已有的辅助函数（如is_suspicious、next_prime 等）。
