@@ -142,3 +142,8 @@ from hog import play, catch_up_strategy
 
 ## 调参与验证建议
 - 在接近胜利（score + potential_gain >= GOAL）时，优先选择能立即获胜或避免被对手利用的保守策略。
+- 策略胜率检验：在终端中运行以下命令，会生成在投多少个骰子时平均得分最高以及各种策略的胜率
+
+```bash
+python3 hog.py -r
+```
