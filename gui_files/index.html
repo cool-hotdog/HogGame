@@ -1,0 +1,303 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="/favicon.gif"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Web site created using create-react-app"/><title>The Game of Hog</title><script defer="defer" src="/static/js/main.26698cde.js"></script><link href="/static/css/main.23506001.css" rel="stylesheet">
+<style>
+/* Tavern Theme Overrides */
+body {
+    background-color: #0f0a05;
+    color: #3e2715;
+    font-family: 'Georgia', serif;
+    overflow-x: hidden;
+}
+
+/* The Scene Background */
+#tavern-scene {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: radial-gradient(circle at 50% 30%, #2a1a0a 0%, #050301 80%);
+    pointer-events: none;
+}
+
+/* UI Container - The "Paper" on the table */
+.container {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: #f0e6d2;
+    padding: 10px;
+    margin: 0 auto;
+    max-width: 800px;
+    position: absolute;
+    bottom: 5%;
+    left: 0; 
+    right: 0;
+    z-index: 10;
+    text-align: center;
+}
+
+/* Hide the big header */
+.hognav {
+    display: none;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+    color: #e8dcc5;
+    text-shadow: 2px 2px 4px #000;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border: none;
+    padding-bottom: 5px;
+    font-size: 1.2rem;
+}
+
+/* Score Boxes - Make them look like wooden plaques or cards */
+.col-6 .p-3.mb-2 {
+    background: linear-gradient(to bottom, #5c3a21, #3e2715) !important;
+    border: 2px solid #8b5a2b !important;
+    color: #f0e6d2 !important;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+}
+
+/* Buttons */
+.btn {
+    background: linear-gradient(to bottom, #d4af37, #aa8c2c);
+    border: 2px solid #fff;
+    color: #3e2715;
+    font-weight: bold;
+    font-family: 'Georgia', serif;
+    text-transform: uppercase;
+    box-shadow: 0 4px 0 #5c3a21;
+    transition: all 0.1s;
+    padding: 10px 30px;
+    font-size: 1.2rem;
+}
+.btn:hover {
+    background: linear-gradient(to bottom, #f0c040, #c0a030);
+    color: #000;
+    transform: translateY(1px);
+    box-shadow: 0 3px 0 #5c3a21;
+}
+.btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+.btn-primary, .btn-secondary, .btn-success, .btn-danger, .btn-light, .btn-dark {
+    background-color: transparent !important;
+    border-color: #fff !important;
+    color: #3e2715 !important;
+}
+
+/* Inputs */
+input, select, textarea, .form-control {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 2px solid #8b5a2b !important;
+    color: #000 !important;
+    font-family: 'Georgia', serif !important;
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2);
+    display: inline-block;
+    width: auto;
+}
+
+/* Dice Graphics */
+svg {
+    filter: drop-shadow(4px 4px 4px rgba(0,0,0,0.6));
+}
+
+/* Hide "Enable Game Rules" text if possible or style it */
+.text-muted {
+    color: #d4c5a3 !important;
+}
+
+/* Animations */
+@keyframes throwLeft {
+    0% { transform: rotate(0deg); }
+    50% { transform: rotate(-45deg); }
+    100% { transform: rotate(0deg); }
+}
+@keyframes throwRight {
+    0% { transform: rotate(0deg); }
+    50% { transform: rotate(45deg); }
+    100% { transform: rotate(0deg); }
+}
+.throwing-left { animation: throwLeft 0.5s ease-in-out; }
+.throwing-right { animation: throwRight 0.5s ease-in-out; }
+
+</style></head><body>
+<div id="tavern-scene">
+    <svg width="100%" height="100%" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
+        <!-- Background Wall -->
+        <rect x="0" y="0" width="800" height="600" fill="#1a1005" />
+        
+        <!-- Lamp Light -->
+        <defs>
+            <radialGradient id="lampLight" cx="0.5" cy="0.3" r="0.5">
+                <stop offset="0%" stop-color="rgba(255, 200, 100, 0.2)" />
+                <stop offset="100%" stop-color="rgba(0,0,0,0)" />
+            </radialGradient>
+        </defs>
+        <rect x="0" y="0" width="800" height="600" fill="url(#lampLight)" />
+
+        <!-- The Table -->
+        <ellipse cx="400" cy="550" rx="500" ry="200" fill="#3e2715" stroke="#2a1a0a" stroke-width="10" />
+        <ellipse cx="400" cy="550" rx="480" ry="180" fill="#0f3b1e" /> <!-- Green felt -->
+
+        <!-- Player 1 (Left - Handsome Young Man) -->
+        <g id="player1" transform="translate(50, 350)">
+            <!-- Body -->
+            <path d="M0,300 Q100,100 200,300" fill="#1a1a2e" /> <!-- Dark Blue Vest/Suit -->
+            <path d="M50,300 L50,200 L150,200 L150,300" fill="#fff" opacity="0.1" /> <!-- Shirt hint -->
+            
+            <!-- Head -->
+            <ellipse cx="100" cy="140" rx="55" ry="65" fill="#ffdbac" /> <!-- Skin -->
+            
+            <!-- Hair (Young/Stylish) -->
+            <path d="M45,140 Q40,80 100,70 Q160,80 155,140 Q160,110 150,90 Q100,60 50,90 Z" fill="#4a3b2a" />
+            
+            <!-- Face Details -->
+            <path d="M100,150 Q110,150 105,165" stroke="#dcbfa0" stroke-width="2" fill="none" /> <!-- Nose -->
+            <path d="M80,130 Q90,125 100,130" stroke="#4a3b2a" stroke-width="2" fill="none" opacity="0.5" /> <!-- Eyebrow L -->
+            <path d="M120,130 Q110,125 100,130" stroke="#4a3b2a" stroke-width="2" fill="none" opacity="0.5" /> <!-- Eyebrow R -->
+            
+            <!-- Arm -->
+            <g id="arm1" transform-origin="100 200">
+                <path d="M100,200 Q150,250 250,220" stroke="#1a1a2e" stroke-width="35" fill="none" stroke-linecap="round" /> <!-- Sleeve -->
+                <path d="M100,200 Q150,250 250,220" stroke="#fff" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="0, 200" /> <!-- Cuff -->
+                <circle cx="250" cy="220" r="22" fill="#ffdbac" /> <!-- Hand -->
+            </g>
+        </g>
+
+        <!-- Player 2 (Right - Middle-aged Bearded Foreigner) -->
+        <g id="player2" transform="translate(550, 350)">
+            <!-- Body -->
+            <path d="M0,300 Q100,100 200,300" fill="#2c1e10" /> <!-- Brown Coat -->
+            <path d="M80,300 L100,180 L120,300" fill="#8b0000" /> <!-- Red Tie/Ascot -->
+            
+            <!-- Head -->
+            <ellipse cx="100" cy="140" rx="60" ry="70" fill="#e0ac69" /> <!-- Darker Skin -->
+            
+            <!-- Hair (Receding/Greyish) -->
+            <path d="M35,140 Q40,100 50,90 Q150,90 165,140 L165,120 Q150,70 50,70 Z" fill="#555" />
+            
+            <!-- Beard -->
+            <path d="M40,140 Q100,230 160,140 Q130,180 100,180 Q70,180 40,140" fill="#555" />
+            <path d="M80,160 Q100,170 120,160" stroke="#333" stroke-width="2" fill="none" /> <!-- Moustache -->
+
+            <!-- Face Details -->
+            <circle cx="125" cy="130" r="10" stroke="#d4af37" stroke-width="2" fill="rgba(255,255,255,0.2)" /> <!-- Monocle -->
+            <path d="M125,130 L125,180" stroke="#d4af37" stroke-width="1" opacity="0.5" /> <!-- Monocle Chain -->
+
+            <!-- Arm -->
+            <g id="arm2" transform-origin="100 200">
+                <path d="M100,200 Q50,250 -50,220" stroke="#2c1e10" stroke-width="35" fill="none" stroke-linecap="round" /> <!-- Sleeve -->
+                <circle cx="-50" cy="220" r="22" fill="#e0ac69" /> <!-- Hand -->
+            </g>
+        </g>
+    </svg>
+</div>
+<noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div><script>
+(function(){
+    function updateStrategies(){
+        var selects = document.querySelectorAll("select");
+        var strategies = ["catch_up"];
+        selects.forEach(function(select){
+            var hasBoar = Array.from(select.options).some(function(opt){return opt.value === "boar_strategy"});
+            if(hasBoar){
+                strategies.forEach(function(strat){
+                    var exists = Array.from(select.options).some(function(opt){return opt.value === strat});
+                    if(!exists){
+                        var opt = document.createElement("option");
+                        opt.value = strat;
+                        opt.textContent = strat;
+                        select.appendChild(opt);
+                    }
+                });
+            }
+        });
+    }
+    document.addEventListener("DOMContentLoaded", function(){
+        updateStrategies();
+        new MutationObserver(updateStrategies).observe(document.body, {childList: true, subtree: true});
+        
+        // Patch fetch to fix score order for strategy calls
+        var originalFetch = window.fetch;
+        var lastGameScores = null;
+
+        function animateArm(id, className) {
+            var el = document.getElementById(id);
+            if(el) {
+                el.classList.remove(className);
+                void el.offsetWidth; // trigger reflow
+                el.classList.add(className);
+            }
+        }
+
+        window.fetch = function(url, options) {
+            // 1. Intercept Strategy Request: Inject correct scores
+            if (typeof url === 'string' && url.endsWith('/strategy') && options && options.body) {
+                // Trigger Computer Animation
+                animateArm('arm2', 'throwing-right');
+
+                try {
+                    var body = JSON.parse(options.body);
+                    if (Array.isArray(body.scores) && body.scores.length === 2) {
+                        console.log("[Hog Patch] Strategy Request. Frontend sent:", body.scores);
+                        
+                        if (lastGameScores) {
+                            console.log("[Hog Patch] Overriding with real scores from take_turn:", lastGameScores);
+                            // lastGameScores is [P0, P1] (Human, Computer).
+                            // We inject this directly. Backend reverses it to [Computer, Human].
+                            // catch_up(Computer, Human) is called. Correct.
+                            body.scores = lastGameScores;
+                            options.body = JSON.stringify(body);
+                        } else {
+                            console.log("[Hog Patch] No score override available. Using frontend scores.");
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error patching fetch for strategy:", e);
+                }
+            }
+            
+            // 2. Intercept Take Turn Request: Detect new game
+            if (typeof url === 'string' && url.endsWith('/take_turn') && options && options.body) {
+                 // Trigger Human Animation
+                 animateArm('arm1', 'throwing-left');
+
+                 try {
+                    var body = JSON.parse(options.body);
+                    // If moveHistory is empty, it's a new game starting
+                    if (body.moveHistory && body.moveHistory.length === 0) {
+                         console.log("[Hog Patch] New Game detected (empty history). Resetting scores.");
+                         lastGameScores = null;
+                    }
+                 } catch(e) {}
+            }
+
+            var fetchPromise = originalFetch.apply(this, arguments);
+            
+            // 3. Intercept Take Turn Response: Capture real scores
+            if (typeof url === 'string' && url.endsWith('/take_turn')) {
+                fetchPromise.then(function(response) {
+                    var clone = response.clone();
+                    clone.json().then(function(data) {
+                        if (data.gameOver) {
+                            console.log("[Hog Patch] Game Over. Resetting scores.");
+                            lastGameScores = null;
+                        } else if (data.finalScores) {
+                            console.log("[Hog Patch] Captured scores:", data.finalScores);
+                            lastGameScores = data.finalScores;
+                        }
+                    }).catch(function(e){});
+                });
+            }
+            
+            return fetchPromise;
+        };
+    });
+})();
+</script></body></html>
