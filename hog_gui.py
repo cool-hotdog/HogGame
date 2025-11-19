@@ -83,14 +83,29 @@ def take_turn(prev_rolls, move_history, goal, game_rules):
     }
 
 
+# Central mapping of strategy names to functions
+STRATEGIES = {
+    "boar_strategy": getattr(hog, "boar_strategy", None),
+    "sus_strategy": getattr(hog, "sus_strategy", None),
+    "catch_up": getattr(hog, "catch_up", None),
+    "always_roll_5": getattr(hog, "always_roll_5", None),
+    "final_strategy": getattr(hog, "final_strategy", None),
+}
+
+# Remove any missing (None) entries to avoid KeyErrors at import time if students
+# haven't implemented some strategies yet.
+STRATEGIES = {k: v for k, v in STRATEGIES.items() if v is not None}
+
+
 @route
 def strategy(name, scores):
-    STRATEGIES = {
-        "boar_strategy": hog.boar_strategy,
-        "sus_strategy": hog.sus_strategy,
-        "final_strategy": hog.final_strategy,
-    }
     return STRATEGIES[name](*scores[::-1])
+
+
+@route
+def strategy_names():
+    """Optional helper route to list available strategies for dynamic UIs."""
+    return sorted(STRATEGIES.keys())
 
 
 @route("dice_graphic.svg")
