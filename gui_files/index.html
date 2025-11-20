@@ -63,6 +63,89 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 4px 8px rgba(0,0,0,0.5);
 }
 
+/* Score Text Positioning */
+.score-container {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 2000 !important;
+    display: block !important;
+    pointer-events: none !important;
+    padding: 0 !important;
+}
+
+.player-score-text {
+    position: absolute !important;
+    font-family: 'Georgia', serif !important;
+    font-size: 1.6rem !important;
+    color: #fff !important;
+    text-shadow: 0 0 10px #d4af37, 2px 2px 4px #000 !important;
+    font-weight: bold !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+}
+
+.p1-score {
+    left: 10% !important;
+    top: 30% !important; /* Above P1 Head */
+    transform: translateX(-50%) !important;
+}
+
+.p2-score {
+    left: 90% !important;
+    top: 30% !important; /* Above P2 Head */
+    transform: translateX(-50%) !important;
+}
+
+/* Game Controls (Turn, Dice) - On the Table */
+.game-controls, .game-controls * {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.game-controls {
+    position: fixed !important; /* Force fixed positioning to ignore parent layout */
+    top: 420px !important; /* Lower part of table */
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    backdrop-filter: blur(5px);
+    padding: 10px !important;
+    border-radius: 15px !important;
+    width: 250px !important; /* Fit within smaller table */
+    text-align: center !important;
+    color: #f0e6d2 !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    pointer-events: auto !important;
+    z-index: 3000 !important; /* High z-index */
+    display: block !important;
+}
+
+/* Settings Controls (Rules, Strategy) - Below the Table */
+.settings-controls, .settings-controls * {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.settings-controls {
+    position: fixed !important; /* Force fixed positioning */
+    top: 600px !important; /* Below the table (outside) */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    margin: 0 !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+    padding: 15px !important;
+    border-radius: 10px !important;
+    width: 500px !important;
+    color: #d4c5a3 !important;
+    border: 1px solid #5c3a21 !important;
+    pointer-events: auto !important;
+    z-index: 3000 !important; /* High z-index */
+    display: block !important;
+}
+
 /* Buttons */
 .btn {
     background: linear-gradient(to bottom, #d4af37, #aa8c2c);
@@ -142,12 +225,57 @@ svg {
         </defs>
         <rect x="0" y="0" width="800" height="600" fill="url(#lampLight)" />
 
+        <!-- Vintage Decor -->
+        <!-- Top Beam -->
+        <rect x="0" y="0" width="800" height="40" fill="#150b05" />
+        <path d="M0,40 L100,120 L0,120 Z" fill="#0f0802" opacity="0.7" /> <!-- Corner Shadow Left -->
+        <path d="M800,40 L700,120 L800,120 Z" fill="#0f0802" opacity="0.7" /> <!-- Corner Shadow Right -->
+
+        <!-- Hanging Lantern (Center) -->
+        <g transform="translate(400, 0)">
+            <line x1="0" y1="0" x2="0" y2="90" stroke="#0f0802" stroke-width="4" />
+            <g transform="translate(0, 90)">
+                <!-- Lantern Top -->
+                <path d="M-28,0 L28,0 L40,20 L-40,20 Z" fill="#2a1a0a" />
+                <!-- Lantern Glass -->
+                <rect x="-37.5" y="20" width="75" height="60" fill="rgba(255, 220, 150, 0.3)" stroke="#1a1005" stroke-width="2" />
+                <!-- Lantern Bottom -->
+                <path d="M-40,80 L40,80 L28,95 L-28,95 Z" fill="#2a1a0a" />
+                <!-- Candle inside -->
+                <rect x="-5" y="50" width="10" height="30" fill="#d4af37" />
+                <circle cx="0" cy="50" r="5" fill="orange" opacity="0.8">
+                    <animate attributeName="opacity" values="0.6;0.9;0.6" dur="3s" repeatCount="indefinite" />
+                </circle>
+            </g>
+        </g>
+
+        <!-- Wall Shelf (Background Left) -->
+        <g transform="translate(100, 180)">
+            <rect x="0" y="0" width="180" height="8" fill="#3e2715" rx="2" />
+            <!-- Bottles -->
+            <path d="M20,-30 L35,-30 L40,0 L15,0 Z" fill="#1a2e1a" opacity="0.8" />
+            <rect x="25" y="-40" width="5" height="10" fill="#1a2e1a" opacity="0.8" />
+            <rect x="60" y="-20" width="25" height="20" fill="#3e2715" stroke="#2a1a0a" />
+            <path d="M120,-35 L140,-35 L145,0 L115,0 Z" fill="#4a1a1a" opacity="0.8" />
+            <rect x="127" y="-45" width="6" height="10" fill="#4a1a1a" opacity="0.8" />
+        </g>
+
+        <!-- Small Window (Background Right) -->
+        <g transform="translate(600, 80)">
+            <rect x="0" y="0" width="100" height="120" fill="#050505" stroke="#2a1a0a" stroke-width="6" rx="2" />
+            <rect x="10" y="10" width="80" height="100" fill="#0a0a15" />
+            <line x1="50" y1="10" x2="50" y2="110" stroke="#1a1005" stroke-width="4" />
+            <line x1="10" y1="60" x2="90" y2="60" stroke="#1a1005" stroke-width="4" />
+            <!-- Moon hint -->
+            <circle cx="70" cy="30" r="8" fill="#ffffe0" opacity="0.2" />
+        </g>
+
         <!-- The Table -->
-        <ellipse cx="400" cy="550" rx="500" ry="200" fill="#3e2715" stroke="#2a1a0a" stroke-width="10" />
-        <ellipse cx="400" cy="550" rx="480" ry="180" fill="#0f3b1e" /> <!-- Green felt -->
+        <ellipse cx="400" cy="350" rx="315" ry="200" fill="#3e2715" stroke="#2a1a0a" stroke-width="10" />
+        <ellipse cx="400" cy="350" rx="295" ry="180" fill="#0f3b1e" /> <!-- Green felt -->
 
         <!-- Player 1 (Left - Handsome Young Man) -->
-        <g id="player1" transform="translate(50, 350)">
+        <g id="player1" transform="translate(20, 150)">
             <!-- Body -->
             <path d="M0,300 Q100,100 200,300" fill="#1a1a2e" /> <!-- Dark Blue Vest/Suit -->
             <path d="M50,300 L50,200 L150,200 L150,300" fill="#fff" opacity="0.1" /> <!-- Shirt hint -->
@@ -172,7 +300,7 @@ svg {
         </g>
 
         <!-- Player 2 (Right - Middle-aged Bearded Foreigner) -->
-        <g id="player2" transform="translate(550, 350)">
+        <g id="player2" transform="translate(620, 150)">
             <!-- Body -->
             <path d="M0,300 Q100,100 200,300" fill="#2c1e10" /> <!-- Brown Coat -->
             <path d="M80,300 L100,180 L120,300" fill="#8b0000" /> <!-- Red Tie/Ascot -->
