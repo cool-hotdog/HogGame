@@ -1,0 +1,484 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="/favicon.gif"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Web site created using create-react-app"/><title>The Game of Hog</title><script defer="defer" src="/static/js/main.26698cde.js"></script><link href="/static/css/main.23506001.css" rel="stylesheet">
+<style>
+/* Tavern Theme Overrides */
+body {
+    background-color: #0f0a05;
+    color: #3e2715;
+    font-family: 'Georgia', serif;
+    overflow-x: hidden;
+}
+
+/* The Scene Background */
+#tavern-scene {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: radial-gradient(circle at 50% 30%, #2a1a0a 0%, #050301 80%);
+    pointer-events: none;
+}
+
+/* UI Container - The "Paper" on the table */
+.container {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: #f0e6d2;
+    padding: 10px;
+    margin: 0 auto;
+    max-width: 800px;
+    position: absolute;
+    bottom: 5%;
+    left: 0; 
+    right: 0;
+    z-index: 10;
+    text-align: center;
+}
+
+/* Hide the big header */
+.hognav {
+    display: none;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+    color: #e8dcc5;
+    text-shadow: 2px 2px 4px #000;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border: none;
+    padding-bottom: 5px;
+    font-size: 1.2rem;
+}
+
+/* Score Boxes - Make them look like wooden plaques or cards */
+.col-6 .p-3.mb-2 {
+    background: linear-gradient(to bottom, #5c3a21, #3e2715) !important;
+    border: 2px solid #8b5a2b !important;
+    color: #f0e6d2 !important;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+}
+
+/* Score Text Positioning */
+.score-container {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 2000 !important;
+    display: block !important;
+    pointer-events: none !important;
+    padding: 0 !important;
+}
+
+.player-score-text {
+    position: absolute !important;
+    font-family: 'Georgia', serif !important;
+    font-size: 1.6rem !important;
+    color: #fff !important;
+    text-shadow: 0 0 10px #d4af37, 2px 2px 4px #000 !important;
+    font-weight: bold !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+}
+
+.p1-score {
+    left: 10% !important;
+    top: 30% !important; /* Above P1 Head */
+    transform: translateX(-50%) !important;
+}
+
+.p2-score {
+    left: 90% !important;
+    top: 30% !important; /* Above P2 Head */
+    transform: translateX(-50%) !important;
+}
+
+/* Game Controls (Turn, Dice) - On the Table */
+.game-controls, .game-controls * {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.game-controls {
+    position: fixed !important; /* Force fixed positioning to ignore parent layout */
+    top: 420px !important; /* Lower part of table */
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    backdrop-filter: blur(5px);
+    padding: 10px !important;
+    border-radius: 15px !important;
+    width: 250px !important; /* Fit within smaller table */
+    text-align: center !important;
+    color: #f0e6d2 !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    pointer-events: auto !important;
+    z-index: 3000 !important; /* High z-index */
+    display: block !important;
+}
+
+/* Settings Controls (Rules, Strategy) - Below the Table */
+.settings-controls, .settings-controls * {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.settings-controls {
+    position: fixed !important; /* Force fixed positioning */
+    top: 600px !important; /* Below the table (outside) */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    margin: 0 !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+    padding: 15px !important;
+    border-radius: 10px !important;
+    width: 500px !important;
+    color: #d4c5a3 !important;
+    border: 1px solid #5c3a21 !important;
+    pointer-events: auto !important;
+    z-index: 3000 !important; /* High z-index */
+    display: block !important;
+}
+
+/* Buttons */
+.btn {
+    background: linear-gradient(to bottom, #d4af37, #aa8c2c);
+    border: 2px solid #fff;
+    color: #3e2715;
+    font-weight: bold;
+    font-family: 'Georgia', serif;
+    text-transform: uppercase;
+    box-shadow: 0 4px 0 #5c3a21;
+    transition: all 0.1s;
+    padding: 10px 30px;
+    font-size: 1.2rem;
+}
+.btn:hover {
+    background: linear-gradient(to bottom, #f0c040, #c0a030);
+    color: #000;
+    transform: translateY(1px);
+    box-shadow: 0 3px 0 #5c3a21;
+}
+.btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+.btn-primary, .btn-secondary, .btn-success, .btn-danger, .btn-light, .btn-dark {
+    background-color: transparent !important;
+    border-color: #fff !important;
+    color: #3e2715 !important;
+}
+
+/* Inputs */
+input, select, textarea, .form-control {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 2px solid #8b5a2b !important;
+    color: #000 !important;
+    font-family: 'Georgia', serif !important;
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2);
+    display: inline-block;
+    width: auto;
+}
+
+/* Dice Graphics */
+svg {
+    filter: drop-shadow(4px 4px 4px rgba(0,0,0,0.6));
+}
+
+/* Hide "Enable Game Rules" text if possible or style it */
+.text-muted {
+    color: #d4c5a3 !important;
+}
+
+/* Animations */
+@keyframes throwLeft {
+    0% { transform: rotate(0deg); }
+    50% { transform: rotate(-45deg); }
+    100% { transform: rotate(0deg); }
+}
+@keyframes throwRight {
+    0% { transform: rotate(0deg); }
+    50% { transform: rotate(45deg); }
+    100% { transform: rotate(0deg); }
+}
+.throwing-left { animation: throwLeft 0.5s ease-in-out; }
+.throwing-right { animation: throwRight 0.5s ease-in-out; }
+
+</style></head><body>
+<div id="tavern-scene">
+    <svg width="100%" height="100%" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
+        <!-- Background Wall -->
+        <rect x="0" y="0" width="800" height="600" fill="#1a1005" />
+        
+        <!-- Lamp Light -->
+        <defs>
+            <radialGradient id="lampLight" cx="0.5" cy="0.3" r="0.5">
+                <stop offset="0%" stop-color="rgba(255, 200, 100, 0.2)" />
+                <stop offset="100%" stop-color="rgba(0,0,0,0)" />
+            </radialGradient>
+        </defs>
+        <rect x="0" y="0" width="800" height="600" fill="url(#lampLight)" />
+
+        <!-- Vintage Decor -->
+        <!-- Top Beam -->
+        <rect x="0" y="0" width="800" height="40" fill="#150b05" />
+        <path d="M0,40 L100,120 L0,120 Z" fill="#0f0802" opacity="0.7" /> <!-- Corner Shadow Left -->
+        <path d="M800,40 L700,120 L800,120 Z" fill="#0f0802" opacity="0.7" /> <!-- Corner Shadow Right -->
+
+        <!-- Hanging Lantern (Center) -->
+        <g transform="translate(400, 0)">
+            <line x1="0" y1="0" x2="0" y2="90" stroke="#0f0802" stroke-width="4" />
+            <g transform="translate(0, 90)">
+                <!-- Lantern Top -->
+                <path d="M-28,0 L28,0 L40,20 L-40,20 Z" fill="#2a1a0a" />
+                <!-- Lantern Glass -->
+                <rect x="-37.5" y="20" width="75" height="60" fill="rgba(255, 220, 150, 0.3)" stroke="#1a1005" stroke-width="2" />
+                <!-- Lantern Bottom -->
+                <path d="M-40,80 L40,80 L28,95 L-28,95 Z" fill="#2a1a0a" />
+                <!-- Candle inside -->
+                <rect x="-5" y="50" width="10" height="30" fill="#d4af37" />
+                <circle cx="0" cy="50" r="5" fill="orange" opacity="0.8">
+                    <animate attributeName="opacity" values="0.6;0.9;0.6" dur="3s" repeatCount="indefinite" />
+                </circle>
+            </g>
+        </g>
+
+        <!-- Wall Shelf (Background Left) -->
+        <g transform="translate(100, 180)">
+            <rect x="0" y="0" width="180" height="8" fill="#3e2715" rx="2" />
+            <!-- Bottles -->
+            <path d="M20,-30 L35,-30 L40,0 L15,0 Z" fill="#1a2e1a" opacity="0.8" />
+            <rect x="25" y="-40" width="5" height="10" fill="#1a2e1a" opacity="0.8" />
+            <rect x="60" y="-20" width="25" height="20" fill="#3e2715" stroke="#2a1a0a" />
+            <path d="M120,-35 L140,-35 L145,0 L115,0 Z" fill="#4a1a1a" opacity="0.8" />
+            <rect x="127" y="-45" width="6" height="10" fill="#4a1a1a" opacity="0.8" />
+        </g>
+
+        <!-- Small Window (Background Right) -->
+        <g transform="translate(600, 80)">
+            <rect x="0" y="0" width="100" height="120" fill="#050505" stroke="#2a1a0a" stroke-width="6" rx="2" />
+            <rect x="10" y="10" width="80" height="100" fill="#0a0a15" />
+            <line x1="50" y1="10" x2="50" y2="110" stroke="#1a1005" stroke-width="4" />
+            <line x1="10" y1="60" x2="90" y2="60" stroke="#1a1005" stroke-width="4" />
+            <!-- Moon hint -->
+            <circle cx="70" cy="30" r="8" fill="#ffffe0" opacity="0.2" />
+        </g>
+
+        <!-- The Table -->
+        <ellipse cx="400" cy="350" rx="315" ry="200" fill="#3e2715" stroke="#2a1a0a" stroke-width="10" />
+        <ellipse cx="400" cy="350" rx="295" ry="180" fill="#0f3b1e" /> <!-- Green felt -->
+
+        <!-- Player 1 (Left - Handsome American Western Cowboy) -->
+        <g id="player1" transform="translate(20, 150)">
+            <!-- Body: Denim Shirt & Leather Vest -->
+            <path d="M20,300 Q100,120 180,300" fill="#1a237e" /> <!-- Denim Shirt -->
+            <path d="M20,300 Q100,120 180,300" fill="none" stroke="#0d47a1" stroke-width="2" />
+            <path d="M30,300 Q50,180 100,180 Q150,180 170,300 L150,300 Q130,200 100,200 Q70,200 50,300 Z" fill="#5D4037" /> <!-- Leather Vest -->
+            <path d="M90,200 L100,240 L110,200" fill="#b71c1c" /> <!-- Red Bandana Knot -->
+            <path d="M80,200 Q100,220 120,200" fill="#d32f2f" /> <!-- Bandana Fold -->
+
+            <!-- Head -->
+            <ellipse cx="100" cy="140" rx="50" ry="60" fill="#ffdbac" /> <!-- Skin -->
+            
+            <!-- Face Details: Stubble & Features -->
+            <path d="M70,160 Q100,190 130,160" fill="rgba(0,0,0,0.1)" /> <!-- Stubble/Jaw Shadow -->
+            <path d="M90,165 Q100,170 110,165" stroke="#8d5524" stroke-width="2" fill="none" /> <!-- Mouth -->
+            <path d="M98,140 L95,155 L105,155 Z" fill="#dcbfa0" /> <!-- Nose -->
+            <path d="M75,135 Q85,130 95,135" stroke="#3e2723" stroke-width="2" fill="none" /> <!-- Eye L -->
+            <path d="M105,135 Q115,130 125,135" stroke="#3e2723" stroke-width="2" fill="none" /> <!-- Eye R -->
+            
+            <!-- Cowboy Hat -->
+            <path d="M10,120 Q100,170 190,120" fill="#3e2723" /> <!-- Brim Back/Bottom -->
+            <path d="M40,120 L50,60 Q100,40 150,60 L160,120" fill="#4e342e" /> <!-- Crown -->
+            <path d="M40,90 Q100,100 160,90" fill="none" stroke="#281915" stroke-width="4" opacity="0.5" /> <!-- Hat Band -->
+            <path d="M10,120 Q100,150 190,120" fill="none" stroke="#281915" stroke-width="2" /> <!-- Brim Edge -->
+        </g>
+
+        <!-- Player 2 (Right - Mature Middle-aged Man - Redesigned) -->
+        <g id="player2" transform="translate(620, 150)">
+            <!-- Body: Cozy Cardigan -->
+            <path d="M20,300 Q100,100 180,300" fill="#4e342e" /> <!-- Dark Brown Cardigan -->
+            <path d="M90,300 L100,180 L110,300" fill="#d7ccc8" /> <!-- Beige Shirt/Vest underneath -->
+            <path d="M20,300 L50,180" stroke="#3e2723" stroke-width="2" /> <!-- Cardigan Edge L -->
+            <path d="M180,300 L150,180" stroke="#3e2723" stroke-width="2" /> <!-- Cardigan Edge R -->
+            <circle cx="95" cy="220" r="3" fill="#3e2723" /> <!-- Button -->
+            <circle cx="95" cy="250" r="3" fill="#3e2723" /> <!-- Button -->
+
+            <!-- Head -->
+            <ellipse cx="100" cy="140" rx="55" ry="65" fill="#e0ac69" /> <!-- Skin -->
+            
+            <!-- Hair: Receding, Grey -->
+            <path d="M35,140 Q40,90 50,80 Q150,80 165,140 L165,120 Q150,60 50,60 Z" fill="#9e9e9e" />
+            
+            <!-- Face Details: Glasses & Beard -->
+            <g opacity="0.8">
+                <circle cx="80" cy="135" r="12" stroke="#333" stroke-width="2" fill="rgba(255,255,255,0.2)" /> <!-- Glasses L -->
+                <circle cx="120" cy="135" r="12" stroke="#333" stroke-width="2" fill="rgba(255,255,255,0.2)" /> <!-- Glasses R -->
+                <line x1="92" y1="135" x2="108" y2="135" stroke="#333" stroke-width="2" /> <!-- Bridge -->
+            </g>
+            
+            <path d="M95,150 L100,160 L105,150" fill="#d7ccc8" opacity="0.5" /> <!-- Nose Shadow -->
+            
+            <!-- Beard: Neat, Grey -->
+            <path d="M45,150 Q100,220 155,150 Q130,180 100,180 Q70,180 45,150" fill="#9e9e9e" opacity="0.9" />
+            <path d="M85,165 Q100,170 115,165" stroke="#616161" stroke-width="2" fill="none" /> <!-- Moustache -->
+        </g>
+    </svg>
+</div>
+<button id="custom-restart-btn" class="btn" style="position: fixed; top: 20px; right: 20px; z-index: 4000;">Start New Game</button>
+<noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div><script>
+(function(){
+    function updateStrategies(){
+        var selects = document.querySelectorAll("select");
+        var strategies = ["catch_up"];
+        selects.forEach(function(select){
+            var hasBoar = Array.from(select.options).some(function(opt){return opt.value === "boar_strategy"});
+            if(hasBoar){
+                strategies.forEach(function(strat){
+                    var exists = Array.from(select.options).some(function(opt){return opt.value === strat});
+                    if(!exists){
+                        var opt = document.createElement("option");
+                        opt.value = strat;
+                        opt.textContent = strat;
+                        select.appendChild(opt);
+                    }
+                });
+            }
+        });
+    }
+    document.addEventListener("DOMContentLoaded", function(){
+        updateStrategies();
+        new MutationObserver(updateStrategies).observe(document.body, {childList: true, subtree: true});
+        
+        // Patch fetch to fix score order for strategy calls
+        var originalFetch = window.fetch;
+        var lastGameScores = null;
+
+        // Custom Restart Button Logic
+        var restartBtn = document.getElementById('custom-restart-btn');
+        if(restartBtn) {
+            restartBtn.addEventListener('click', function() {
+                // 1. Try to find the React "New Game" button (even if hidden)
+                var buttons = document.querySelectorAll('button');
+                var found = false;
+                for(var i=0; i<buttons.length; i++) {
+                    // Look for button with text "New Game" or similar
+                    if(buttons[i] !== restartBtn && (buttons[i].textContent.toUpperCase().includes('NEW GAME') || buttons[i].textContent.includes('New Game'))) {
+                        buttons[i].click();
+                        found = true;
+                        console.log("[Hog Patch] Clicked existing New Game button.");
+                        break;
+                    }
+                }
+                
+                // 2. Reset Settings (Checkboxes and Selects)
+                // Reset Checkboxes (Rules)
+                var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(function(cb) {
+                    if(cb.checked) {
+                        cb.click(); // Click to toggle off and trigger React state change
+                    }
+                });
+                
+                // Reset Selects (Strategy)
+                var selects = document.querySelectorAll('select');
+                selects.forEach(function(sel) {
+                    // Assuming the first option is the default/empty one
+                    if (sel.value !== sel.options[0].value) {
+                        sel.value = sel.options[0].value;
+                        var event = new Event('change', { bubbles: true });
+                        sel.dispatchEvent(event);
+                    }
+                });
+
+                // 3. If not found or failed, reload page
+                if(!found) {
+                    console.log("[Hog Patch] New Game button not found, reloading page.");
+                    window.location.reload();
+                } else {
+                    // If we clicked the internal button, we should also manually reset our score patch
+                    lastGameScores = null;
+                }
+            });
+        }
+
+        function animateArm(id, className) {
+            var el = document.getElementById(id);
+            if(el) {
+                el.classList.remove(className);
+                void el.offsetWidth; // trigger reflow
+                el.classList.add(className);
+            }
+        }
+
+        window.fetch = function(url, options) {
+            // 1. Intercept Strategy Request: Inject correct scores
+            if (typeof url === 'string' && url.endsWith('/strategy') && options && options.body) {
+                // Trigger Computer Animation
+                animateArm('arm2', 'throwing-right');
+
+                try {
+                    var body = JSON.parse(options.body);
+                    if (Array.isArray(body.scores) && body.scores.length === 2) {
+                        console.log("[Hog Patch] Strategy Request. Frontend sent:", body.scores);
+                        
+                        if (lastGameScores) {
+                            console.log("[Hog Patch] Overriding with real scores from take_turn:", lastGameScores);
+                            // lastGameScores is [P0, P1] (Human, Computer).
+                            // We inject this directly. Backend reverses it to [Computer, Human].
+                            // catch_up(Computer, Human) is called. Correct.
+                            body.scores = lastGameScores;
+                            options.body = JSON.stringify(body);
+                        } else {
+                            console.log("[Hog Patch] No score override available. Using frontend scores.");
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error patching fetch for strategy:", e);
+                }
+            }
+            
+            // 2. Intercept Take Turn Request: Detect new game
+            if (typeof url === 'string' && url.endsWith('/take_turn') && options && options.body) {
+                 // Trigger Human Animation
+                 animateArm('arm1', 'throwing-left');
+
+                 try {
+                    var body = JSON.parse(options.body);
+                    // If moveHistory is empty, it's a new game starting
+                    if (body.moveHistory && body.moveHistory.length === 0) {
+                         console.log("[Hog Patch] New Game detected (empty history). Resetting scores.");
+                         lastGameScores = null;
+                    }
+                 } catch(e) {}
+            }
+
+            var fetchPromise = originalFetch.apply(this, arguments);
+            
+            // 3. Intercept Take Turn Response: Capture real scores
+            if (typeof url === 'string' && url.endsWith('/take_turn')) {
+                fetchPromise.then(function(response) {
+                    var clone = response.clone();
+                    clone.json().then(function(data) {
+                        if (data.gameOver) {
+                            console.log("[Hog Patch] Game Over. Resetting scores.");
+                            lastGameScores = null;
+                        } else if (data.finalScores) {
+                            console.log("[Hog Patch] Captured scores:", data.finalScores);
+                            lastGameScores = data.finalScores;
+                        }
+                    }).catch(function(e){});
+                });
+            }
+            
+            return fetchPromise;
+        };
+    });
+})();
+</script></body></html>
